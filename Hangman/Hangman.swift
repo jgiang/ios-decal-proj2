@@ -60,9 +60,9 @@ class Hangman {
         if guessedLetters!.count == 0 {
             return ""
         }
-        var result: String!
+        var result: String! = ""
         for (var i = 0; i < guessedLetters!.count; i += 1) {
-            result = result + ", \(guessedLetters?.objectAtIndex(i))"
+            result = result + ", \(guessedLetters!.objectAtIndex(i))"
         }
         return result
     }
