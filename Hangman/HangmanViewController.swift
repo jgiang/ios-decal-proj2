@@ -8,7 +8,7 @@
 
 import UIKit
 
-class HangmanViewController: UIViewController {
+class HangmanViewController: UIViewController, UITextFieldDelegate {
     
     // undoes all guesses
     @IBOutlet var startOverButton: UIButton!
@@ -34,6 +34,7 @@ class HangmanViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        self.inputText.delegate = self
     }
 
     override func didReceiveMemoryWarning() {
@@ -41,13 +42,17 @@ class HangmanViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        guessButton.sendActionsForControlEvents(UIControlEvents.TouchUpInside)
+        return false
+    }
     
     @IBAction func startGame(sender: UIButton) {
         // tag of newGame button is 0
         if (sender.tag == 0) {
             game = Hangman()
             gameInProgress = true
-            gameFinished = false
             game.start()
             print(game.answer)
             numIncorrectGuesses = 0
@@ -56,7 +61,6 @@ class HangmanViewController: UIViewController {
         // tag of startOver button is 1
         } else if (sender.tag == 1 && (gameInProgress || gameFinished)) {
             gameInProgress = true
-            gameFinished = false
             game.knownString = ""
             for (var i = 0; i < game.answer!.characters.count; i += 1) {
                 if (game.answer! as NSString).substringWithRange(NSMakeRange(i, 1)) == " " {
@@ -66,7 +70,9 @@ class HangmanViewController: UIViewController {
                 }
             }
             game.guessedLetters?.removeAllObjects()
+            numIncorrectGuesses = 0
             stateImage.image = UIImage(named:"basic-hangman-img/hangman\(numIncorrectGuesses+1).gif")
+
         } else {
             let alertController = UIAlertController(title: "Nothing to Undo", message: "You have not started a game", preferredStyle: UIAlertControllerStyle.Alert)
             alertController.addAction(UIAlertAction(title: "Gotcha", style: UIAlertActionStyle.Default,handler: nil))
@@ -75,6 +81,7 @@ class HangmanViewController: UIViewController {
         }
         revealedSecretPhrase.text = game.knownString
         previousGuesses.text = ""
+        gameFinished = false
     }
     
     @IBAction func makeGuess(sender: UIButton) {
